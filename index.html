@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visual Builder</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Toolbar -->
+    <header id="toolbar">
+      <div class="toolbar-left">
+        <span class="toolbar-logo">✦ Visual Builder</span>
+      </div>
+      <div class="toolbar-center">
+        <button class="tb-btn active" data-view="desktop" title="Desktop">🖥</button>
+        <button class="tb-btn" data-view="tablet" title="Tablet">📱</button>
+        <button class="tb-btn" data-view="mobile" title="Mobile">📟</button>
+      </div>
+      <div class="toolbar-right">
+        <button class="tb-btn" id="undoBtn" title="Undo (Ctrl+Z)">↩</button>
+        <button class="tb-btn" id="duplicateBtn" title="Duplicate (Ctrl+D)">⧉</button>
+        <button class="tb-btn" id="deleteBtn" title="Delete (Delete)">✕</button>
+        <button class="tb-btn" id="clearBtn" title="Clear canvas">🗑</button>
+        <button class="tb-btn tb-btn-primary" id="exportBtn">Export</button>
+      </div>
+    </header>
+
+    <!-- Main layout -->
+    <div id="main">
+      <!-- Canvas -->
+      <div id="canvas-area">
+        <div id="canvas-wrapper">
+          <div id="canvas">
+            <div class="canvas-empty">Drag components here or click from the palette</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right sidebar -->
+      <aside id="sidebar">
+        <div class="sidebar-tabs">
+          <button class="sidebar-tab active" data-tab="palette">Components</button>
+          <button class="sidebar-tab" data-tab="props">Properties</button>
+        </div>
+        <div class="sidebar-content">
+          <div class="tab-panel active" id="tab-palette">
+            <div class="palette-search-wrap"><input class="palette-search" type="text" id="paletteSearchInput" placeholder="Search components..."></div>
+            <div id="palette-grid-container"></div>
+          </div>
+          <div class="tab-panel" id="tab-props">
+            <div class="props-empty">Select a component to edit</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Export modal -->
+  <div id="export-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Export</h3>
+        <button class="modal-close" id="exportClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="export-options">
+          <label><input type="radio" name="exportMode" value="full" checked> Full HTML page</label>
+          <label><input type="radio" name="exportMode" value="snippet"> HTML snippet</label>
+        </div>
+        <textarea id="exportOutput" readonly rows="12"></textarea>
+        <button id="copyBtn" class="btn">Copy to clipboard</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
