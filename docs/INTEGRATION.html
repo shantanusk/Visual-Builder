@@ -188,6 +188,7 @@
   <a href="#1-6" class="nav-h3">1.6 Undo / Redo</a>
   <a href="#1-7" class="nav-h3">1.7 Keyboard Shortcuts</a>
   <a href="#sec2" class="nav-section">2. Adding Components</a>
+  <a href="#2-0" class="nav-h3">2.0 registerComponent()</a>
   <a href="#2-1" class="nav-h3">2.1 Basic Component</a>
   <a href="#2-2" class="nav-h3">2.2 Container (children)</a>
   <a href="#2-3" class="nav-h3">2.3 Column-Based</a>
@@ -198,6 +199,7 @@
   <a href="#3-3" class="nav-h3">3.3 Hosting &amp; Deploy</a>
   <a href="#3-4" class="nav-h3">3.4 Analytics</a>
   <a href="#3-5" class="nav-h3">3.5 Backend Persistence</a>
+  <a href="#bootstrap" class="nav-section">&#x2B06; Bootstrap 5</a>
   <a href="#sec4" class="nav-section">4. Styling &amp; Theming</a>
   <a href="#sec5" class="nav-section">5. Config Reference</a>
 </nav>
@@ -435,6 +437,49 @@ undoStack.length = 0;</code></pre>
     <tr><td><code>propsConfig</code></td><td>array</td><td>Property editor definitions</td></tr>
   </tbody>
 </table>
+
+<h3 id="2-0">Programmatic Registration</h3>
+<p>Use <code>registerComponent(type, definition)</code> to add components at runtime. The <code>template</code> can be a function or a string with <code>{{prop}}</code> placeholders &mdash; useful when loading from JSON.</p>
+
+<pre><code>// With a function (full control)
+registerComponent('alert_banner', {
+  category: 'ui',
+  label: 'Alert Banner',
+  icon: '\uD83D\uDD14',
+  defaultProps: { message: 'Notice!', bgColor: '#fff3cd', textColor: '#856404' },
+  template: (p) =&gt; `&lt;div style="background:${p.bgColor};color:${p.textColor};padding:12px;"&gt;${p.message}&lt;/div&gt;`,
+  propsConfig: [
+    { key: 'message', label: 'Message', type: 'text' },
+    { key: 'bgColor', label: 'Background', type: 'color' },
+    { key: 'textColor', label: 'Text Color', type: 'color' }
+  ]
+});
+
+// With a string template &mdash; works from JSON
+registerComponent('notice_bar', {
+  category: 'ui',
+  label: 'Notice Bar',
+  icon: '\u26A0',
+  defaultProps: { text: 'Hello', bg: '#e94560' },
+  template: '&lt;div style="background:{{bg}};color:#fff;padding:10px;text-align:center;"&gt;{{text}}&lt;/div&gt;',
+  propsConfig: [
+    { key: 'text', label: 'Text', type: 'text' },
+    { key: 'bg', label: 'Background', type: 'color' }
+  ]
+});
+
+// Load from a JSON string
+var json = '{ \
+  "type": "myComp", \
+  "category": "ui", \
+  "label": "My Comp", \
+  "icon": "\u2605", \
+  "defaultProps": { "msg": "Hello" }, \
+  "template": "<div>{{msg}}</div>", \
+  "propsConfig": [{ "key": "msg", "label": "Message", "type": "text" }] \
+}';
+var def = JSON.parse(json);
+registerComponent(def.type, def);</code></pre>
 
 <h3 id="2-1">2.1 Basic Component</h3>
 <pre><code>REGISTRY['alert_banner'] = {
@@ -699,6 +744,51 @@ renderCanvas = function() {
     renderProps();
   }
 }</code></pre>
+
+<hr>
+
+<!-- ============================================================ -->
+<h2 id="bootstrap">&#x2B06; Bootstrap 5 Integration</h2>
+
+<p>VB ships with a Bootstrap 5.3 integration as a standalone option. All 27 built-in components are re-registered with Bootstrap classes (cards, alerts, navbar, grid columns, form controls, badges, list groups, tables) while preserving the same props interface.</p>
+
+<h3>Files</h3>
+<table>
+  <thead>
+    <tr><th>File</th><th>Purpose</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>integrations/bootstrap.html</code></td><td>Standalone demo page. Loads Bootstrap 5.3 CSS from CDN, then <code>app.js</code>, then <code>bootstrap.js</code>.</td></tr>
+    <tr><td><code>integrations/bootstrap.js</code></td><td>Replaces each <code>REGISTRY</code> entry with a Bootstrap-flavored version.</td></tr>
+  </tbody>
+</table>
+
+<h3>How it works</h3>
+<p>The integration script runs after <code>app.js</code> and overrides every entry in the global <code>REGISTRY</code> object. Components render with Bootstrap classes (<code>.btn</code>, <code>.card</code>, <code>.navbar</code>, <code>.alert</code>, <code>.badge</code>, <code>.list-group</code>, <code>.form-control</code>, grid <code>.row</code>/<code>.col-*</code>) while user-configured props (colors, sizes) are applied via inline styles on top. Canvas state and export work identically.</p>
+
+<h3>Component mapping</h3>
+<table>
+  <thead>
+    <tr><th>Default</th><th>Bootstrap 5</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>button</td><td><code>.btn</code> with <code>.btn-lg</code>/<code>.btn-sm</code></td></tr>
+    <tr><td>card</td><td><code>.card.shadow-sm</code></td></tr>
+    <tr><td>alert</td><td><code>.alert</code> with dismiss button</td></tr>
+    <tr><td>badge</td><td><code>.badge</code></td></tr>
+    <tr><td>header / footer / navbar</td><td><code>.navbar</code>, <code>footer.py-4</code></td></tr>
+    <tr><td>hero</td><td><code>.display-4</code> + <code>.lead</code> + <code>.btn-lg</code></td></tr>
+    <tr><td>features</td><td>Card grid with <code>.row.g-4</code></td></tr>
+    <tr><td>pricing</td><td><code>.card</code> with bordered accent</td></tr>
+    <tr><td>contact / form</td><td><code>.form-label</code> + <code>.form-control</code></td></tr>
+    <tr><td>columns</td><td><code>.row</code> + <code>.col-md-*</code></td></tr>
+    <tr><td>blockquote</td><td><code>.blockquote</code> + <code>.blockquote-footer</code></td></tr>
+    <tr><td>list</td><td><code>.list-group</code></td></tr>
+    <tr><td>code</td><td><code>pre.bg-dark.text-light</code></td></tr>
+  </tbody>
+</table>
+
+<p>Open <code>integrations/bootstrap.html</code> in a browser to try it.</p>
 
 <hr>
 

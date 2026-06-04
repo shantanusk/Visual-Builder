@@ -21,491 +21,7 @@ const tabPalette = $('#tab-palette');
 const tabProps = $('#tab-props');
 
 // === Component Registry ===
-const REGISTRY = {
-  // Layout
-  container: {
-    category: 'layout', label: 'Container', icon: '▣',
-    defaultProps: { maxWidth: '960px', padding: '20px', background: '#ffffff' },
-    template: (p, children) => `<div class="comp-container" style="max-width:${p.maxWidth};margin:0 auto;padding:${p.padding};background:${p.background};">
-  <div class="component-content">${children || '<p style="color:#999;margin:0;">Container content</p>'}</div>
-</div>`,
-    propsConfig: [
-      { key: 'maxWidth', label: 'Max Width', type: 'text' },
-      { key: 'padding', label: 'Padding', type: 'text' },
-      { key: 'background', label: 'Background', type: 'color' }
-    ]
-  },
-  section: {
-    category: 'layout', label: 'Section', icon: '▬',
-    defaultProps: { padding: '60px 20px', background: '#f8f9fa' },
-    template: (p, children) => `<section class="comp-section" style="padding:${p.padding};background:${p.background};text-align:center;">
-  <div class="component-content">${children || '<h2 style="margin:0 0 12px;font-size:28px;">Section Title</h2><p style="color:#666;margin:0;">Section content goes here.</p>'}</div>
-</section>`,
-    propsConfig: [
-      { key: 'padding', label: 'Padding', type: 'text' },
-      { key: 'background', label: 'Background', type: 'color' }
-    ]
-  },
-  columns2: {
-    category: 'layout', label: '2 Columns', icon: '▌▐',
-    defaultProps: { gap: '20px', padding: '20px' },
-    template: (p, children, cols) => `<div class="comp-columns" style="display:grid;grid-template-columns:1fr 1fr;gap:${p.gap};padding:${p.padding};background:#fff;">
-  <div data-col="0" style="min-height:40px;">${cols && cols[0] ? cols[0] : '<div style="padding:12px;background:#f0f0f0;border-radius:4px;text-align:center;"><p style="color:#888;margin:0;">Column 1</p></div>'}</div>
-  <div data-col="1" style="min-height:40px;">${cols && cols[1] ? cols[1] : '<div style="padding:12px;background:#f0f0f0;border-radius:4px;text-align:center;"><p style="color:#888;margin:0;">Column 2</p></div>'}</div>
-</div>`,
-    propsConfig: [
-      { key: 'gap', label: 'Gap', type: 'text' },
-      { key: 'padding', label: 'Padding', type: 'text' }
-    ]
-  },
-  columns3: {
-    category: 'layout', label: '3 Columns', icon: '≡',
-    defaultProps: { gap: '16px', padding: '20px' },
-    template: (p, children, cols) => `<div class="comp-columns" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:${p.gap};padding:${p.padding};background:#fff;">
-  <div data-col="0" style="min-height:40px;">${cols && cols[0] ? cols[0] : '<div style="padding:12px;background:#f0f0f0;border-radius:4px;text-align:center;"><p style="color:#888;margin:0;">Col 1</p></div>'}</div>
-  <div data-col="1" style="min-height:40px;">${cols && cols[1] ? cols[1] : '<div style="padding:12px;background:#f0f0f0;border-radius:4px;text-align:center;"><p style="color:#888;margin:0;">Col 2</p></div>'}</div>
-  <div data-col="2" style="min-height:40px;">${cols && cols[2] ? cols[2] : '<div style="padding:12px;background:#f0f0f0;border-radius:4px;text-align:center;"><p style="color:#888;margin:0;">Col 3</p></div>'}</div>
-</div>`,
-    propsConfig: [
-      { key: 'gap', label: 'Gap', type: 'text' },
-      { key: 'padding', label: 'Padding', type: 'text' }
-    ]
-  },
-  header: {
-    category: 'layout', label: 'Header', icon: '⊞',
-    defaultProps: { brand: 'Logo', bgColor: '#2c3e50', textColor: '#ffffff' },
-    template: (p, children) => `<header class="comp-header" style="background:${p.bgColor};color:${p.textColor};padding:12px 24px;display:flex;align-items:center;justify-content:space-between;">
-  <strong style="font-size:18px;">${p.brand}</strong>
-  <nav style="display:flex;gap:16px;">
-    <a href="#" style="color:${p.textColor};text-decoration:none;font-size:14px;">Home</a>
-    <a href="#" style="color:${p.textColor};text-decoration:none;font-size:14px;">About</a>
-    <a href="#" style="color:${p.textColor};text-decoration:none;font-size:14px;">Contact</a>
-  </nav>
-  <div class="component-content">${children || ''}</div>
-</header>`,
-    propsConfig: [
-      { key: 'brand', label: 'Brand', type: 'text' },
-      { key: 'bgColor', label: 'Background', type: 'color' },
-      { key: 'textColor', label: 'Text Color', type: 'color' }
-    ]
-  },
-  footer: {
-    category: 'layout', label: 'Footer', icon: '⊟',
-    defaultProps: { text: '© 2026 All rights reserved.', bgColor: '#2c3e50', textColor: '#ffffff' },
-    template: (p, children) => `<footer class="comp-footer" style="background:${p.bgColor};color:${p.textColor};padding:24px;text-align:center;font-size:14px;">
-  <div class="component-content">${children || p.text}</div>
-</footer>`,
-    propsConfig: [
-      { key: 'text', label: 'Text', type: 'text' },
-      { key: 'bgColor', label: 'Background', type: 'color' },
-      { key: 'textColor', label: 'Text Color', type: 'color' }
-    ]
-  },
-
-  // UI Elements
-  button: {
-    category: 'ui', label: 'Button', icon: '▢',
-    defaultProps: { text: 'Click Me', variant: '#e94560', size: '14px', fullWidth: false },
-    template: (p) => `<div style="padding:8px;text-align:center;"><button class="comp-button" style="background:${p.variant};color:#fff;border:none;padding:${p.size === '16px' ? '12px 24px' : p.size === '12px' ? '4px 12px' : '8px 20px'};font-size:${p.size};border-radius:4px;cursor:pointer;${p.fullWidth ? 'width:100%;' : ''}font-weight:600;">${p.text}</button></div>`,
-    propsConfig: [
-      { key: 'text', label: 'Text', type: 'text' },
-      { key: 'variant', label: 'Color', type: 'color' },
-      { key: 'size', label: 'Size', type: 'select', options: ['12px', '14px', '16px'] },
-      { key: 'fullWidth', label: 'Full Width', type: 'checkbox' }
-    ]
-  },
-  card: {
-    category: 'ui', label: 'Card', icon: '◻',
-    defaultProps: { title: 'Card Title', text: 'Some quick example text for this card.', btnText: 'Learn More', accentColor: '#e94560' },
-    template: (p) => `<div class="comp-card" style="border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;margin:12px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-  <div style="height:120px;background:${p.accentColor}22;display:flex;align-items:center;justify-content:center;color:${p.accentColor};font-size:32px;">📷</div>
-  <div style="padding:16px;">
-    <h3 style="margin:0 0 8px;font-size:18px;">${p.title}</h3>
-    <p style="color:#666;font-size:14px;line-height:1.5;">${p.text}</p>
-    <button style="margin-top:12px;background:${p.accentColor};color:#fff;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:13px;font-weight:600;">${p.btnText}</button>
-  </div>
-</div>`,
-    propsConfig: [
-      { key: 'title', label: 'Title', type: 'text' },
-      { key: 'text', label: 'Text', type: 'textarea' },
-      { key: 'btnText', label: 'Button Text', type: 'text' },
-      { key: 'accentColor', label: 'Accent Color', type: 'color' }
-    ]
-  },
-  alert: {
-    category: 'ui', label: 'Alert', icon: '⚠',
-    defaultProps: { message: 'This is an alert message!', type: '#e94560', dismissible: false },
-    template: (p) => `<div class="comp-alert" style="background:${p.type}16;border:1px solid ${p.type};border-radius:4px;padding:12px 16px;margin:8px 12px;color:#333;font-size:14px;display:flex;align-items:center;justify-content:space-between;">
-  <span>${p.message}</span>
-  ${p.dismissible ? '<button style="background:none;border:none;font-size:18px;cursor:pointer;color:#999;">&times;</button>' : ''}
-</div>`,
-    propsConfig: [
-      { key: 'message', label: 'Message', type: 'text' },
-      { key: 'type', label: 'Color', type: 'color' },
-      { key: 'dismissible', label: 'Dismissible', type: 'checkbox' }
-    ]
-  },
-  badge: {
-    category: 'ui', label: 'Badge', icon: '◆',
-    defaultProps: { text: 'New', color: '#e94560' },
-    template: (p) => `<div style="padding:8px 12px;"><span class="comp-badge" style="background:${p.color};color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;display:inline-block;">${p.text}</span></div>`,
-    propsConfig: [
-      { key: 'text', label: 'Text', type: 'text' },
-      { key: 'color', label: 'Color', type: 'color' }
-    ]
-  },
-  divider: {
-    category: 'ui', label: 'Divider', icon: '—',
-    defaultProps: { color: '#e0e0e0', thickness: '1px', margin: '16px 12px' },
-    template: (p) => `<hr class="comp-divider" style="border:none;border-top:${p.thickness} solid ${p.color};margin:${p.margin};">`,
-    propsConfig: [
-      { key: 'color', label: 'Color', type: 'color' },
-      { key: 'thickness', label: 'Thickness', type: 'text' },
-      { key: 'margin', label: 'Margin', type: 'text' }
-    ]
-  },
-  list: {
-    category: 'ui', label: 'List', icon: '☰',
-    defaultProps: { items: 'Item 1\nItem 2\nItem 3', ordered: false },
-    template: (p) => {
-      const items = p.items.split('\n').map(i => i.trim()).filter(Boolean);
-      const tag = p.ordered ? 'ol' : 'ul';
-      const lis = items.map(i => `<li style="padding:4px 0;font-size:14px;color:#444;">${i}</li>`).join('\n    ');
-      return `<${tag} class="comp-list" style="margin:12px 24px;padding-left:20px;">
-    ${lis}
-  </${tag}>`;
-    },
-    propsConfig: [
-      { key: 'items', label: 'Items (one per line)', type: 'textarea' },
-      { key: 'ordered', label: 'Ordered', type: 'checkbox' }
-    ]
-  },
-
-  // Content Sections
-  hero: {
-    category: 'content', label: 'Hero', icon: '⬡',
-    defaultProps: { heading: 'Build Something Amazing', subtitle: 'Create beautiful pages with our drag-and-drop builder.', ctaText: 'Get Started', bgColor: '#1a1a2e', textColor: '#ffffff', align: 'center' },
-    template: (p) => `<section class="comp-hero" style="padding:80px 24px;background:${p.bgColor};text-align:${p.align};color:${p.textColor};">
-  <h1 style="font-size:42px;margin:0 0 16px;font-weight:800;line-height:1.2;">${p.heading}</h1>
-  <p style="font-size:18px;margin:0 auto 24px;max-width:600px;opacity:0.85;line-height:1.6;">${p.subtitle}</p>
-  <button style="background:${p.textColor};color:${p.bgColor};border:none;padding:14px 32px;border-radius:4px;font-size:16px;font-weight:700;cursor:pointer;">${p.ctaText}</button>
-</section>`,
-    propsConfig: [
-      { key: 'heading', label: 'Heading', type: 'text' },
-      { key: 'subtitle', label: 'Subtitle', type: 'textarea' },
-      { key: 'ctaText', label: 'Button Text', type: 'text' },
-      { key: 'bgColor', label: 'Background', type: 'color' },
-      { key: 'textColor', label: 'Text Color', type: 'color' },
-      { key: 'align', label: 'Alignment', type: 'select', options: ['left', 'center', 'right'] }
-    ]
-  },
-  features: {
-    category: 'content', label: 'Features', icon: '⊞',
-    defaultProps: { heading: 'Features', feature1: 'Fast', desc1: 'Lightning quick performance.', feature2: 'Simple', desc2: 'Easy to use interface.', feature3: 'Powerful', desc3: 'Do more with less effort.' },
-    template: (p) => `<section class="comp-features" style="padding:60px 24px;background:#f8f9fa;text-align:center;">
-  <h2 style="margin:0 0 40px;font-size:32px;color:#222;">${p.heading}</h2>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:900px;margin:0 auto;">
-    <div style="background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-      <div style="font-size:32px;margin-bottom:12px;">⚡</div>
-      <h3 style="margin:0 0 8px;font-size:18px;color:#333;">${p.feature1}</h3>
-      <p style="color:#666;font-size:14px;line-height:1.5;">${p.desc1}</p>
-    </div>
-    <div style="background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-      <div style="font-size:32px;margin-bottom:12px;">🎯</div>
-      <h3 style="margin:0 0 8px;font-size:18px;color:#333;">${p.feature2}</h3>
-      <p style="color:#666;font-size:14px;line-height:1.5;">${p.desc2}</p>
-    </div>
-    <div style="background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-      <div style="font-size:32px;margin-bottom:12px;">🚀</div>
-      <h3 style="margin:0 0 8px;font-size:18px;color:#333;">${p.feature3}</h3>
-      <p style="color:#666;font-size:14px;line-height:1.5;">${p.desc3}</p>
-    </div>
-  </div>
-</section>`,
-    propsConfig: [
-      { key: 'heading', label: 'Section Heading', type: 'text' },
-      { key: 'feature1', label: 'Feature 1 Name', type: 'text' },
-      { key: 'desc1', label: 'Feature 1 Desc', type: 'text' },
-      { key: 'feature2', label: 'Feature 2 Name', type: 'text' },
-      { key: 'desc2', label: 'Feature 2 Desc', type: 'text' },
-      { key: 'feature3', label: 'Feature 3 Name', type: 'text' },
-      { key: 'desc3', label: 'Feature 3 Desc', type: 'text' }
-    ]
-  },
-  pricing: {
-    category: 'content', label: 'Pricing', icon: '$',
-    defaultProps: { plan: 'Pro', price: '$29', period: '/mo', feature1: '10 projects', feature2: 'Unlimited pages', feature3: 'Priority support', ctaText: 'Choose Plan', accentColor: '#e94560' },
-    template: (p) => `<section style="padding:60px 24px;background:#fff;text-align:center;">
-  <div style="max-width:340px;margin:0 auto;border:2px solid ${p.accentColor};border-radius:12px;padding:32px;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
-    <h3 style="margin:0 0 8px;font-size:20px;color:#333;">${p.plan}</h3>
-    <div style="font-size:44px;font-weight:800;color:#222;">${p.price}<span style="font-size:16px;font-weight:400;color:#888;">${p.period}</span></div>
-    <ul style="list-style:none;padding:0;margin:24px 0;text-align:left;">
-      <li style="padding:8px 0;font-size:14px;color:#555;">✓ ${p.feature1}</li>
-      <li style="padding:8px 0;font-size:14px;color:#555;">✓ ${p.feature2}</li>
-      <li style="padding:8px 0;font-size:14px;color:#555;">✓ ${p.feature3}</li>
-    </ul>
-    <button style="width:100%;background:${p.accentColor};color:#fff;border:none;padding:12px;border-radius:4px;font-size:15px;font-weight:700;cursor:pointer;">${p.ctaText}</button>
-  </div>
-</section>`,
-    propsConfig: [
-      { key: 'plan', label: 'Plan Name', type: 'text' },
-      { key: 'price', label: 'Price', type: 'text' },
-      { key: 'period', label: 'Period', type: 'text' },
-      { key: 'feature1', label: 'Feature 1', type: 'text' },
-      { key: 'feature2', label: 'Feature 2', type: 'text' },
-      { key: 'feature3', label: 'Feature 3', type: 'text' },
-      { key: 'ctaText', label: 'Button Text', type: 'text' },
-      { key: 'accentColor', label: 'Accent Color', type: 'color' }
-    ]
-  },
-  testimonial: {
-    category: 'content', label: 'Testimonial', icon: '"',
-    defaultProps: { quote: 'This is the best product we have ever used. Highly recommended!', author: 'Jane Doe', role: 'CEO, Company Inc.' },
-    template: (p) => `<div style="padding:32px 24px;background:#f8f9fa;text-align:center;margin:8px 12px;border-radius:8px;">
-  <div style="font-size:36px;color:#ddd;margin-bottom:8px;">❝</div>
-  <blockquote style="font-size:16px;font-style:italic;color:#555;max-width:500px;margin:0 auto 16px;line-height:1.6;">${p.quote}</blockquote>
-  <strong style="font-size:14px;color:#333;">${p.author}</strong>
-  <div style="font-size:13px;color:#888;">${p.role}</div>
-</div>`,
-    propsConfig: [
-      { key: 'quote', label: 'Quote', type: 'textarea' },
-      { key: 'author', label: 'Author', type: 'text' },
-      { key: 'role', label: 'Role', type: 'text' }
-    ]
-  },
-  contact: {
-    category: 'content', label: 'Contact Form', icon: '✉',
-    defaultProps: { email: 'hello@example.com', btnText: 'Send Message', accentColor: '#e94560' },
-    template: (p) => `<section style="padding:40px 24px;background:#fff;">
-  <form style="max-width:500px;margin:0 auto;">
-    <div style="margin-bottom:12px;">
-      <label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px;">Name</label>
-      <input type="text" placeholder="Your name" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;">
-    </div>
-    <div style="margin-bottom:12px;">
-      <label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px;">Email</label>
-      <input type="email" placeholder="${p.email}" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;">
-    </div>
-    <div style="margin-bottom:12px;">
-      <label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px;">Message</label>
-      <textarea rows="4" placeholder="Your message" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;resize:vertical;"></textarea>
-    </div>
-    <button type="submit" style="background:${p.accentColor};color:#fff;border:none;padding:12px 24px;border-radius:4px;font-size:15px;font-weight:600;cursor:pointer;">${p.btnText}</button>
-  </form>
-</section>`,
-    propsConfig: [
-      { key: 'email', label: 'Placeholder Email', type: 'text' },
-      { key: 'btnText', label: 'Button Text', type: 'text' },
-      { key: 'accentColor', label: 'Accent Color', type: 'color' }
-    ]
-  },
-
-  // Typography
-  heading: {
-    category: 'typography', label: 'Heading', icon: 'H',
-    defaultProps: { text: 'Heading Text', level: 'h2', align: 'left', color: '#222' },
-    template: (p) => {
-      const sizes = { h1: '36px', h2: '28px', h3: '22px', h4: '18px', h5: '16px', h6: '14px' };
-      return `<${p.level} class="comp-heading" style="margin:12px 16px;font-size:${sizes[p.level] || '28px'};text-align:${p.align};color:${p.color};font-weight:700;line-height:1.3;">${p.text}</${p.level}>`;
-    },
-    propsConfig: [
-      { key: 'text', label: 'Text', type: 'text' },
-      { key: 'level', label: 'Level', type: 'select', options: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] },
-      { key: 'align', label: 'Alignment', type: 'select', options: ['left', 'center', 'right'] },
-      { key: 'color', label: 'Color', type: 'color' }
-    ]
-  },
-  paragraph: {
-    category: 'typography', label: 'Paragraph', icon: 'P',
-    defaultProps: { text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.', align: 'left', color: '#444', size: '15px' },
-    template: (p) => `<p class="comp-paragraph" style="margin:8px 16px;font-size:${p.size};text-align:${p.align};color:${p.color};line-height:1.6;">${p.text}</p>`,
-    propsConfig: [
-      { key: 'text', label: 'Text', type: 'textarea' },
-      { key: 'align', label: 'Alignment', type: 'select', options: ['left', 'center', 'right', 'justify'] },
-      { key: 'color', label: 'Color', type: 'color' },
-      { key: 'size', label: 'Size', type: 'select', options: ['13px', '14px', '15px', '16px', '18px'] }
-    ]
-  },
-  blockquote: {
-    category: 'typography', label: 'Blockquote', icon: '❝',
-    defaultProps: { text: 'The only way to do great work is to love what you do.', cite: 'Steve Jobs', borderColor: '#e94560' },
-    template: (p) => `<blockquote class="comp-blockquote" style="margin:16px 24px;padding:12px 16px;border-left:4px solid ${p.borderColor};background:#f9f9f9;border-radius:0 4px 4px 0;">
-  <p style="font-style:italic;font-size:15px;color:#555;line-height:1.6;margin:0 0 8px;">&ldquo;${p.text}&rdquo;</p>
-  <cite style="font-size:13px;color:#888;font-style:normal;">— ${p.cite}</cite>
-</blockquote>`,
-    propsConfig: [
-      { key: 'text', label: 'Quote', type: 'textarea' },
-      { key: 'cite', label: 'Citation', type: 'text' },
-      { key: 'borderColor', label: 'Border Color', type: 'color' }
-    ]
-  },
-  code: {
-    category: 'typography', label: 'Code Block', icon: '<>',
-    defaultProps: { code: 'const greeting = "Hello World";\nconsole.log(greeting);', language: 'javascript' },
-    template: (p) => `<pre class="comp-code" style="margin:12px 16px;padding:16px;background:#1e1e2e;color:#cdd6f4;border-radius:6px;font-family:'SF Mono','Fira Code',monospace;font-size:13px;line-height:1.5;overflow-x:auto;"><code>${p.code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</code></pre>`,
-    propsConfig: [
-      { key: 'code', label: 'Code', type: 'textarea' },
-      { key: 'language', label: 'Language', type: 'text' }
-    ]
-  },
-
-  // Navigation
-  navbar: {
-    category: 'navigation', label: 'Navbar', icon: '≡',
-    defaultProps: { brand: 'BrandName', link1: 'Home', link2: 'About', link3: 'Services', link4: 'Contact', bgColor: '#ffffff', textColor: '#333' },
-    template: (p) => `<nav class="comp-navbar" style="background:${p.bgColor};color:${p.textColor};padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;border-bottom:1px solid #eee;font-family:sans-serif;">
-  <strong style="font-size:20px;font-weight:700;">${p.brand}</strong>
-  <div style="display:flex;gap:24px;">
-    <a style="color:${p.textColor};text-decoration:none;font-size:14px;font-weight:500;">${p.link1}</a>
-    <a style="color:${p.textColor};text-decoration:none;font-size:14px;font-weight:500;">${p.link2}</a>
-    <a style="color:${p.textColor};text-decoration:none;font-size:14px;font-weight:500;">${p.link3}</a>
-    <a style="color:${p.textColor};text-decoration:none;font-size:14px;font-weight:500;">${p.link4}</a>
-  </div>
-</nav>`,
-    propsConfig: [
-      { key: 'brand', label: 'Brand', type: 'text' },
-      { key: 'link1', label: 'Link 1', type: 'text' },
-      { key: 'link2', label: 'Link 2', type: 'text' },
-      { key: 'link3', label: 'Link 3', type: 'text' },
-      { key: 'link4', label: 'Link 4', type: 'text' },
-      { key: 'bgColor', label: 'Background', type: 'color' },
-      { key: 'textColor', label: 'Text Color', type: 'color' }
-    ]
-  },
-
-  // Layout extras
-  columns4: {
-    category: 'layout', label: '4 Columns', icon: '☰',
-    defaultProps: { gap: '12px', padding: '20px' },
-    template: (p, children, cols) => `<div class="comp-columns4" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:${p.gap};padding:${p.padding};background:#fff;">
-  <div data-col="0" style="min-height:40px;">${cols && cols[0] ? cols[0] : '<div style="padding:10px;background:#f5f5f5;border-radius:4px;text-align:center;font-size:13px;color:#888;">Col 1</div>'}</div>
-  <div data-col="1" style="min-height:40px;">${cols && cols[1] ? cols[1] : '<div style="padding:10px;background:#f5f5f5;border-radius:4px;text-align:center;font-size:13px;color:#888;">Col 2</div>'}</div>
-  <div data-col="2" style="min-height:40px;">${cols && cols[2] ? cols[2] : '<div style="padding:10px;background:#f5f5f5;border-radius:4px;text-align:center;font-size:13px;color:#888;">Col 3</div>'}</div>
-  <div data-col="3" style="min-height:40px;">${cols && cols[3] ? cols[3] : '<div style="padding:10px;background:#f5f5f5;border-radius:4px;text-align:center;font-size:13px;color:#888;">Col 4</div>'}</div>
-</div>`,
-    propsConfig: [
-      { key: 'gap', label: 'Gap', type: 'text' },
-      { key: 'padding', label: 'Padding', type: 'text' }
-    ]
-  },
-
-  // UI extras
-  table: {
-    category: 'ui', label: 'Table', icon: '⊞',
-    defaultProps: { header1: 'Name', header2: 'Email', header3: 'Role', row1: 'John Doe', row1e: 'john@example.com', row1r: 'Admin', row2: 'Jane Smith', row2e: 'jane@example.com', row2r: 'Editor', row3: 'Bob Johnson', row3e: 'bob@example.com', row3r: 'Viewer' },
-    template: (p) => `<div style="padding:12px;overflow-x:auto;">
-  <table style="width:100%;border-collapse:collapse;font-size:14px;font-family:sans-serif;">
-    <thead>
-      <tr style="background:#f8f9fa;">
-        <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #dee2e6;font-weight:600;color:#333;">${p.header1}</th>
-        <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #dee2e6;font-weight:600;color:#333;">${p.header2}</th>
-        <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #dee2e6;font-weight:600;color:#333;">${p.header3}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">${p.row1}</td><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">${p.row1e}</td><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">${p.row1r}</td></tr>
-      <tr><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">${p.row2}</td><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">${p.row2e}</td><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">${p.row2r}</td></tr>
-      <tr><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">${p.row3}</td><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">${p.row3e}</td><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">${p.row3r}</td></tr>
-    </tbody>
-  </table>
-</div>`,
-    propsConfig: [
-      { key: 'header1', label: 'Header 1', type: 'text' },
-      { key: 'header2', label: 'Header 2', type: 'text' },
-      { key: 'header3', label: 'Header 3', type: 'text' },
-      { key: 'row1', label: 'Row 1 Col 1', type: 'text' },
-      { key: 'row1e', label: 'Row 1 Col 2', type: 'text' },
-      { key: 'row1r', label: 'Row 1 Col 3', type: 'text' },
-      { key: 'row2', label: 'Row 2 Col 1', type: 'text' },
-      { key: 'row2e', label: 'Row 2 Col 2', type: 'text' },
-      { key: 'row2r', label: 'Row 2 Col 3', type: 'text' },
-      { key: 'row3', label: 'Row 3 Col 1', type: 'text' },
-      { key: 'row3e', label: 'Row 3 Col 2', type: 'text' },
-      { key: 'row3r', label: 'Row 3 Col 3', type: 'text' }
-    ]
-  },
-
-  // Content extras
-  signature: {
-    category: 'content', label: 'Signature', icon: '✍',
-    defaultProps: { name: 'Sarah Johnson', title: 'CEO & Founder', text: 'Building the future, one step at a time.', photo: '👩‍💼' },
-    template: (p) => `<div style="padding:24px;display:flex;align-items:center;gap:16px;background:#fafafa;margin:8px 12px;border-radius:8px;">
-  <div style="font-size:48px;width:64px;height:64px;display:flex;align-items:center;justify-content:center;background:#e94560;color:#fff;border-radius:50%;flex-shrink:0;">${p.photo}</div>
-  <div>
-    <strong style="font-size:16px;color:#222;display:block;">${p.name}</strong>
-    <span style="font-size:13px;color:#e94560;font-weight:600;">${p.title}</span>
-    <p style="margin:6px 0 0;font-size:13px;color:#666;line-height:1.4;">${p.text}</p>
-  </div>
-</div>`,
-    propsConfig: [
-      { key: 'name', label: 'Name', type: 'text' },
-      { key: 'title', label: 'Title', type: 'text' },
-      { key: 'text', label: 'Description', type: 'text' },
-      { key: 'photo', label: 'Photo Emoji', type: 'text' }
-    ]
-  },
-  product: {
-    category: 'content', label: 'Product', icon: '🏷',
-    defaultProps: { name: 'Premium Widget', price: '$49.99', oldPrice: '$79.99', desc: 'High-quality widget with premium features and lifetime warranty.', badge: 'Sale', btnText: 'Add to Cart', accentColor: '#e94560' },
-    template: (p) => `<div style="padding:16px;margin:8px 12px;">
-  <div style="border:1px solid #eee;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);max-width:320px;margin:0 auto;background:#fff;">
-    <div style="height:160px;background:linear-gradient(135deg,${p.accentColor}22,#f8f9fa);display:flex;align-items:center;justify-content:center;position:relative;">
-      <span style="font-size:48px;">📦</span>
-      <span style="position:absolute;top:12px;left:12px;background:${p.accentColor};color:#fff;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;">${p.badge}</span>
-      <span style="position:absolute;top:12px;right:12px;background:#fff;color:#333;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:700;">★ 4.8</span>
-    </div>
-    <div style="padding:16px;">
-      <h3 style="margin:0 0 6px;font-size:17px;color:#222;">${p.name}</h3>
-      <div style="margin-bottom:8px;">
-        <span style="font-size:22px;font-weight:800;color:${p.accentColor};">${p.price}</span>
-        <span style="font-size:14px;color:#999;text-decoration:line-through;margin-left:8px;">${p.oldPrice}</span>
-      </div>
-      <p style="font-size:13px;color:#666;line-height:1.5;margin:0 0 14px;">${p.desc}</p>
-      <button style="width:100%;background:${p.accentColor};color:#fff;border:none;padding:10px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;">${p.btnText}</button>
-    </div>
-  </div>
-</div>`,
-    propsConfig: [
-      { key: 'name', label: 'Product Name', type: 'text' },
-      { key: 'price', label: 'Price', type: 'text' },
-      { key: 'oldPrice', label: 'Old Price', type: 'text' },
-      { key: 'desc', label: 'Description', type: 'textarea' },
-      { key: 'badge', label: 'Badge Text', type: 'text' },
-      { key: 'btnText', label: 'Button Text', type: 'text' },
-      { key: 'accentColor', label: 'Accent Color', type: 'color' }
-    ]
-  },
-  form: {
-    category: 'content', label: 'Form', icon: '📋',
-    defaultProps: { heading: 'Get in Touch', nameLabel: 'Name', emailLabel: 'Email', messageLabel: 'Message', btnText: 'Submit', accentColor: '#e94560' },
-    template: (p) => `<section style="padding:40px 24px;background:#fff;">
-  <form style="max-width:480px;margin:0 auto;background:#fafafa;padding:28px;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,0.04);">
-    <h3 style="margin:0 0 20px;font-size:22px;color:#222;text-align:center;">${p.heading}</h3>
-    <div style="margin-bottom:14px;">
-      <label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px;">${p.nameLabel}</label>
-      <input type="text" placeholder="${p.nameLabel}" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:#fff;">
-    </div>
-    <div style="margin-bottom:14px;">
-      <label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px;">${p.emailLabel}</label>
-      <input type="email" placeholder="${p.emailLabel}" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:#fff;">
-    </div>
-    <div style="margin-bottom:14px;">
-      <label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px;">${p.messageLabel}</label>
-      <textarea rows="4" placeholder="${p.messageLabel}" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;resize:vertical;background:#fff;"></textarea>
-    </div>
-    <button type="submit" style="width:100%;background:${p.accentColor};color:#fff;border:none;padding:12px;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;">${p.btnText}</button>
-  </form>
-</section>`,
-    propsConfig: [
-      { key: 'heading', label: 'Heading', type: 'text' },
-      { key: 'nameLabel', label: 'Name Label', type: 'text' },
-      { key: 'emailLabel', label: 'Email Label', type: 'text' },
-      { key: 'messageLabel', label: 'Message Label', type: 'text' },
-      { key: 'btnText', label: 'Button Text', type: 'text' },
-      { key: 'accentColor', label: 'Accent Color', type: 'color' }
-    ]
-  }
-};
+const REGISTRY = {};
 
 const CATEGORIES = {
   layout: { label: 'Layout', icon: '⊞' },
@@ -515,7 +31,379 @@ const CATEGORIES = {
   typography: { label: 'Typography', icon: 'T' }
 };
 
+// === Component Registration ===
+
+function registerComponent(type, definition) {
+  const def = Object.assign({}, definition);
+  if (typeof def.template === 'string') {
+    const tpl = def.template;
+    def.template = function (props, children, columns) {
+      return tpl.replace(/\{\{(\w+)(?::([^}]*))?\}\}/g, function (_, key, fallback) {
+        if (key === 'children') return children || (fallback !== undefined ? fallback : '');
+        if (key === 'col0') return (columns && columns[0]) || (fallback !== undefined ? fallback : '');
+        if (key === 'col1') return (columns && columns[1]) || (fallback !== undefined ? fallback : '');
+        if (key === 'col2') return (columns && columns[2]) || (fallback !== undefined ? fallback : '');
+        if (key === 'col3') return (columns && columns[3]) || (fallback !== undefined ? fallback : '');
+        return props[key] !== undefined ? props[key] : (fallback !== undefined ? fallback : '');
+      });
+    };
+  }
+  REGISTRY[type] = def;
+  if (typeof renderPalette === 'function') renderPalette();
+  return type;
+}
+
 // === Palette ===
+
+// === Built-in Component Definitions ===
+
+registerComponent('container', {
+  category: 'layout', label: 'Container', icon: '▣',
+  defaultProps: { maxWidth: '960px', padding: '20px', background: '#ffffff' },
+  template: '<div class="comp-container" style="max-width:{{maxWidth}};margin:0 auto;padding:{{padding}};background:{{background}};"><div class="component-content">{{children:<p style="color:#999;margin:0;">Container content</p>}}</div></div>',
+  propsConfig: [
+    { key: 'maxWidth', label: 'Max Width', type: 'text' },
+    { key: 'padding', label: 'Padding', type: 'text' },
+    { key: 'background', label: 'Background', type: 'color' }
+  ]
+});
+
+registerComponent('section', {
+  category: 'layout', label: 'Section', icon: '▬',
+  defaultProps: { padding: '60px 20px', background: '#f8f9fa' },
+  template: '<section class="comp-section" style="padding:{{padding}};background:{{background}};text-align:center;"><div class="component-content">{{children:<h2 style="margin:0 0 12px;font-size:28px;">Section Title</h2><p style="color:#666;margin:0;">Section content goes here.</p>}}</div></section>',
+  propsConfig: [
+    { key: 'padding', label: 'Padding', type: 'text' },
+    { key: 'background', label: 'Background', type: 'color' }
+  ]
+});
+
+registerComponent('columns2', {
+  category: 'layout', label: '2 Columns', icon: '▌▐',
+  defaultProps: { gap: '20px', padding: '20px' },
+  template: '<div class="comp-columns" style="display:grid;grid-template-columns:1fr 1fr;gap:{{gap}};padding:{{padding}};background:#fff;"><div data-col="0" style="min-height:40px;">{{col0:<div style="padding:12px;background:#f0f0f0;border-radius:4px;text-align:center;"><p style="color:#888;margin:0;">Column 1</p></div>}}</div><div data-col="1" style="min-height:40px;">{{col1:<div style="padding:12px;background:#f0f0f0;border-radius:4px;text-align:center;"><p style="color:#888;margin:0;">Column 2</p></div>}}</div></div>',
+  propsConfig: [
+    { key: 'gap', label: 'Gap', type: 'text' },
+    { key: 'padding', label: 'Padding', type: 'text' }
+  ]
+});
+
+registerComponent('columns3', {
+  category: 'layout', label: '3 Columns', icon: '≡',
+  defaultProps: { gap: '16px', padding: '20px' },
+  template: '<div class="comp-columns" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:{{gap}};padding:{{padding}};background:#fff;"><div data-col="0" style="min-height:40px;">{{col0:<div style="padding:12px;background:#f0f0f0;border-radius:4px;text-align:center;"><p style="color:#888;margin:0;">Col 1</p></div>}}</div><div data-col="1" style="min-height:40px;">{{col1:<div style="padding:12px;background:#f0f0f0;border-radius:4px;text-align:center;"><p style="color:#888;margin:0;">Col 2</p></div>}}</div><div data-col="2" style="min-height:40px;">{{col2:<div style="padding:12px;background:#f0f0f0;border-radius:4px;text-align:center;"><p style="color:#888;margin:0;">Col 3</p></div>}}</div></div>',
+  propsConfig: [
+    { key: 'gap', label: 'Gap', type: 'text' },
+    { key: 'padding', label: 'Padding', type: 'text' }
+  ]
+});
+
+registerComponent('columns4', {
+  category: 'layout', label: '4 Columns', icon: '☰',
+  defaultProps: { gap: '12px', padding: '20px' },
+  template: '<div class="comp-columns4" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:{{gap}};padding:{{padding}};background:#fff;"><div data-col="0" style="min-height:40px;">{{col0:<div style="padding:10px;background:#f5f5f5;border-radius:4px;text-align:center;font-size:13px;color:#888;">Col 1</div>}}</div><div data-col="1" style="min-height:40px;">{{col1:<div style="padding:10px;background:#f5f5f5;border-radius:4px;text-align:center;font-size:13px;color:#888;">Col 2</div>}}</div><div data-col="2" style="min-height:40px;">{{col2:<div style="padding:10px;background:#f5f5f5;border-radius:4px;text-align:center;font-size:13px;color:#888;">Col 3</div>}}</div><div data-col="3" style="min-height:40px;">{{col3:<div style="padding:10px;background:#f5f5f5;border-radius:4px;text-align:center;font-size:13px;color:#888;">Col 4</div>}}</div></div>',
+  propsConfig: [
+    { key: 'gap', label: 'Gap', type: 'text' },
+    { key: 'padding', label: 'Padding', type: 'text' }
+  ]
+});
+
+registerComponent('header', {
+  category: 'layout', label: 'Header', icon: '⊞',
+  defaultProps: { brand: 'Logo', bgColor: '#2c3e50', textColor: '#ffffff' },
+  template: '<header class="comp-header" style="background:{{bgColor}};color:{{textColor}};padding:12px 24px;display:flex;align-items:center;justify-content:space-between;"><strong style="font-size:18px;">{{brand}}</strong><nav style="display:flex;gap:16px;"><a href="#" style="color:{{textColor}};text-decoration:none;font-size:14px;">Home</a><a href="#" style="color:{{textColor}};text-decoration:none;font-size:14px;">About</a><a href="#" style="color:{{textColor}};text-decoration:none;font-size:14px;">Contact</a></nav><div class="component-content">{{children}}</div></header>',
+  propsConfig: [
+    { key: 'brand', label: 'Brand', type: 'text' },
+    { key: 'bgColor', label: 'Background', type: 'color' },
+    { key: 'textColor', label: 'Text Color', type: 'color' }
+  ]
+});
+
+registerComponent('footer', {
+  category: 'layout', label: 'Footer', icon: '⊟',
+  defaultProps: { text: '© 2026 All rights reserved.', bgColor: '#2c3e50', textColor: '#ffffff' },
+  template: function(p, children) {
+    return '<footer class="comp-footer" style="background:' + p.bgColor + ';color:' + p.textColor + ';padding:24px;text-align:center;font-size:14px;"><div class="component-content">' + (children || p.text) + '</div></footer>';
+  },
+  propsConfig: [
+    { key: 'text', label: 'Text', type: 'text' },
+    { key: 'bgColor', label: 'Background', type: 'color' },
+    { key: 'textColor', label: 'Text Color', type: 'color' }
+  ]
+});
+
+registerComponent('button', {
+  category: 'ui', label: 'Button', icon: '▢',
+  defaultProps: { text: 'Click Me', variant: '#e94560', size: '14px', fullWidth: false },
+  template: function(p) {
+    var btnClass = p.size === '16px' ? 'padding:12px 24px;' : p.size === '12px' ? 'padding:4px 12px;' : 'padding:8px 20px;';
+    var w = p.fullWidth ? 'width:100%;' : '';
+    return '<div style="padding:8px;text-align:center;"><button class="comp-button" style="background:' + p.variant + ';color:#fff;border:none;' + btnClass + 'font-size:' + p.size + ';border-radius:4px;cursor:pointer;' + w + 'font-weight:600;">' + p.text + '</button></div>';
+  },
+  propsConfig: [
+    { key: 'text', label: 'Text', type: 'text' },
+    { key: 'variant', label: 'Color', type: 'color' },
+    { key: 'size', label: 'Size', type: 'select', options: ['12px', '14px', '16px'] },
+    { key: 'fullWidth', label: 'Full Width', type: 'checkbox' }
+  ]
+});
+
+registerComponent('card', {
+  category: 'ui', label: 'Card', icon: '◻',
+  defaultProps: { title: 'Card Title', text: 'Some quick example text for this card.', btnText: 'Learn More', accentColor: '#e94560' },
+  template: '<div class="comp-card" style="border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;margin:12px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.06);"><div style="height:120px;background:{{accentColor}}22;display:flex;align-items:center;justify-content:center;color:{{accentColor}};font-size:32px;">📷</div><div style="padding:16px;"><h3 style="margin:0 0 8px;font-size:18px;">{{title}}</h3><p style="color:#666;font-size:14px;line-height:1.5;">{{text}}</p><button style="margin-top:12px;background:{{accentColor}};color:#fff;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:13px;font-weight:600;">{{btnText}}</button></div></div>',
+  propsConfig: [
+    { key: 'title', label: 'Title', type: 'text' },
+    { key: 'text', label: 'Text', type: 'textarea' },
+    { key: 'btnText', label: 'Button Text', type: 'text' },
+    { key: 'accentColor', label: 'Accent Color', type: 'color' }
+  ]
+});
+
+registerComponent('alert', {
+  category: 'ui', label: 'Alert', icon: '⚠',
+  defaultProps: { message: 'This is an alert message!', type: '#e94560', dismissible: false },
+  template: function(p) {
+    return '<div class="comp-alert" style="background:' + p.type + '16;border:1px solid ' + p.type + ';border-radius:4px;padding:12px 16px;margin:8px 12px;color:#333;font-size:14px;display:flex;align-items:center;justify-content:space-between;"><span>' + p.message + '</span>' + (p.dismissible ? '<button style="background:none;border:none;font-size:18px;cursor:pointer;color:#999;">&times;</button>' : '') + '</div>';
+  },
+  propsConfig: [
+    { key: 'message', label: 'Message', type: 'text' },
+    { key: 'type', label: 'Color', type: 'color' },
+    { key: 'dismissible', label: 'Dismissible', type: 'checkbox' }
+  ]
+});
+
+registerComponent('badge', {
+  category: 'ui', label: 'Badge', icon: '◆',
+  defaultProps: { text: 'New', color: '#e94560' },
+  template: '<div style="padding:8px 12px;"><span class="comp-badge" style="background:{{color}};color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;display:inline-block;">{{text}}</span></div>',
+  propsConfig: [
+    { key: 'text', label: 'Text', type: 'text' },
+    { key: 'color', label: 'Color', type: 'color' }
+  ]
+});
+
+registerComponent('divider', {
+  category: 'ui', label: 'Divider', icon: '—',
+  defaultProps: { color: '#e0e0e0', thickness: '1px', margin: '16px 12px' },
+  template: '<hr class="comp-divider" style="border:none;border-top:{{thickness}} solid {{color}};margin:{{margin}};">',
+  propsConfig: [
+    { key: 'color', label: 'Color', type: 'color' },
+    { key: 'thickness', label: 'Thickness', type: 'text' },
+    { key: 'margin', label: 'Margin', type: 'text' }
+  ]
+});
+
+registerComponent('table', {
+  category: 'ui', label: 'Table', icon: '⊞',
+  defaultProps: { header1: 'Name', header2: 'Email', header3: 'Role', row1: 'John Doe', row1e: 'john@example.com', row1r: 'Admin', row2: 'Jane Smith', row2e: 'jane@example.com', row2r: 'Editor', row3: 'Bob Johnson', row3e: 'bob@example.com', row3r: 'Viewer' },
+  template: '<div style="padding:12px;overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:14px;font-family:sans-serif;"><thead><tr style="background:#f8f9fa;"><th style="padding:10px 12px;text-align:left;border-bottom:2px solid #dee2e6;font-weight:600;color:#333;">{{header1}}</th><th style="padding:10px 12px;text-align:left;border-bottom:2px solid #dee2e6;font-weight:600;color:#333;">{{header2}}</th><th style="padding:10px 12px;text-align:left;border-bottom:2px solid #dee2e6;font-weight:600;color:#333;">{{header3}}</th></tr></thead><tbody><tr><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">{{row1}}</td><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">{{row1e}}</td><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">{{row1r}}</td></tr><tr><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">{{row2}}</td><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">{{row2e}}</td><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">{{row2r}}</td></tr><tr><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">{{row3}}</td><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">{{row3e}}</td><td style="padding:10px 12px;border-bottom:1px solid #eee;color:#555;">{{row3r}}</td></tr></tbody></table></div>',
+  propsConfig: [
+    { key: 'header1', label: 'Header 1', type: 'text' },
+    { key: 'header2', label: 'Header 2', type: 'text' },
+    { key: 'header3', label: 'Header 3', type: 'text' },
+    { key: 'row1', label: 'Row 1 Col 1', type: 'text' },
+    { key: 'row1e', label: 'Row 1 Col 2', type: 'text' },
+    { key: 'row1r', label: 'Row 1 Col 3', type: 'text' },
+    { key: 'row2', label: 'Row 2 Col 1', type: 'text' },
+    { key: 'row2e', label: 'Row 2 Col 2', type: 'text' },
+    { key: 'row2r', label: 'Row 2 Col 3', type: 'text' },
+    { key: 'row3', label: 'Row 3 Col 1', type: 'text' },
+    { key: 'row3e', label: 'Row 3 Col 2', type: 'text' },
+    { key: 'row3r', label: 'Row 3 Col 3', type: 'text' }
+  ]
+});
+
+registerComponent('list', {
+  category: 'ui', label: 'List', icon: '☰',
+  defaultProps: { items: 'Item 1\nItem 2\nItem 3', ordered: false },
+  template: function(p) {
+    var items = p.items.split('\n').map(function(i) { return i.trim(); }).filter(Boolean);
+    var tag = p.ordered ? 'ol' : 'ul';
+    var lis = items.map(function(i) { return '<li style="padding:4px 0;font-size:14px;color:#444;">' + i + '</li>'; }).join('\n    ');
+    return '<' + tag + ' class="comp-list" style="margin:12px 24px;padding-left:20px;">\n    ' + lis + '\n  </' + tag + '>';
+  },
+  propsConfig: [
+    { key: 'items', label: 'Items (one per line)', type: 'textarea' },
+    { key: 'ordered', label: 'Ordered', type: 'checkbox' }
+  ]
+});
+
+registerComponent('hero', {
+  category: 'content', label: 'Hero', icon: '⬡',
+  defaultProps: { heading: 'Build Something Amazing', subtitle: 'Create beautiful pages with our drag-and-drop builder.', ctaText: 'Get Started', bgColor: '#1a1a2e', textColor: '#ffffff', align: 'center' },
+  template: '<section class="comp-hero" style="padding:80px 24px;background:{{bgColor}};text-align:{{align}};color:{{textColor}};"><h1 style="font-size:42px;margin:0 0 16px;font-weight:800;line-height:1.2;">{{heading}}</h1><p style="font-size:18px;margin:0 auto 24px;max-width:600px;opacity:0.85;line-height:1.6;">{{subtitle}}</p><button style="background:{{textColor}};color:{{bgColor}};border:none;padding:14px 32px;border-radius:4px;font-size:16px;font-weight:700;cursor:pointer;">{{ctaText}}</button></section>',
+  propsConfig: [
+    { key: 'heading', label: 'Heading', type: 'text' },
+    { key: 'subtitle', label: 'Subtitle', type: 'textarea' },
+    { key: 'ctaText', label: 'Button Text', type: 'text' },
+    { key: 'bgColor', label: 'Background', type: 'color' },
+    { key: 'textColor', label: 'Text Color', type: 'color' },
+    { key: 'align', label: 'Alignment', type: 'select', options: ['left', 'center', 'right'] }
+  ]
+});
+
+registerComponent('features', {
+  category: 'content', label: 'Features', icon: '⊞',
+  defaultProps: { heading: 'Features', feature1: 'Fast', desc1: 'Lightning quick performance.', feature2: 'Simple', desc2: 'Easy to use interface.', feature3: 'Powerful', desc3: 'Do more with less effort.' },
+  template: '<section class="comp-features" style="padding:60px 24px;background:#f8f9fa;text-align:center;"><h2 style="margin:0 0 40px;font-size:32px;color:#222;">{{heading}}</h2><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:900px;margin:0 auto;"><div style="background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.06);"><div style="font-size:32px;margin-bottom:12px;">⚡</div><h3 style="margin:0 0 8px;font-size:18px;color:#333;">{{feature1}}</h3><p style="color:#666;font-size:14px;line-height:1.5;">{{desc1}}</p></div><div style="background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.06);"><div style="font-size:32px;margin-bottom:12px;">🎯</div><h3 style="margin:0 0 8px;font-size:18px;color:#333;">{{feature2}}</h3><p style="color:#666;font-size:14px;line-height:1.5;">{{desc2}}</p></div><div style="background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.06);"><div style="font-size:32px;margin-bottom:12px;">🚀</div><h3 style="margin:0 0 8px;font-size:18px;color:#333;">{{feature3}}</h3><p style="color:#666;font-size:14px;line-height:1.5;">{{desc3}}</p></div></div></section>',
+  propsConfig: [
+    { key: 'heading', label: 'Section Heading', type: 'text' },
+    { key: 'feature1', label: 'Feature 1 Name', type: 'text' },
+    { key: 'desc1', label: 'Feature 1 Desc', type: 'text' },
+    { key: 'feature2', label: 'Feature 2 Name', type: 'text' },
+    { key: 'desc2', label: 'Feature 2 Desc', type: 'text' },
+    { key: 'feature3', label: 'Feature 3 Name', type: 'text' },
+    { key: 'desc3', label: 'Feature 3 Desc', type: 'text' }
+  ]
+});
+
+registerComponent('pricing', {
+  category: 'content', label: 'Pricing', icon: '$',
+  defaultProps: { plan: 'Pro', price: '$29', period: '/mo', feature1: '10 projects', feature2: 'Unlimited pages', feature3: 'Priority support', ctaText: 'Choose Plan', accentColor: '#e94560' },
+  template: '<section style="padding:60px 24px;background:#fff;text-align:center;"><div style="max-width:340px;margin:0 auto;border:2px solid {{accentColor}};border-radius:12px;padding:32px;box-shadow:0 4px 16px rgba(0,0,0,0.08);"><h3 style="margin:0 0 8px;font-size:20px;color:#333;">{{plan}}</h3><div style="font-size:44px;font-weight:800;color:#222;">{{price}}<span style="font-size:16px;font-weight:400;color:#888;">{{period}}</span></div><ul style="list-style:none;padding:0;margin:24px 0;text-align:left;"><li style="padding:8px 0;font-size:14px;color:#555;">✓ {{feature1}}</li><li style="padding:8px 0;font-size:14px;color:#555;">✓ {{feature2}}</li><li style="padding:8px 0;font-size:14px;color:#555;">✓ {{feature3}}</li></ul><button style="width:100%;background:{{accentColor}};color:#fff;border:none;padding:12px;border-radius:4px;font-size:15px;font-weight:700;cursor:pointer;">{{ctaText}}</button></div></section>',
+  propsConfig: [
+    { key: 'plan', label: 'Plan Name', type: 'text' },
+    { key: 'price', label: 'Price', type: 'text' },
+    { key: 'period', label: 'Period', type: 'text' },
+    { key: 'feature1', label: 'Feature 1', type: 'text' },
+    { key: 'feature2', label: 'Feature 2', type: 'text' },
+    { key: 'feature3', label: 'Feature 3', type: 'text' },
+    { key: 'ctaText', label: 'Button Text', type: 'text' },
+    { key: 'accentColor', label: 'Accent Color', type: 'color' }
+  ]
+});
+
+registerComponent('testimonial', {
+  category: 'content', label: 'Testimonial', icon: '"',
+  defaultProps: { quote: 'This is the best product we have ever used. Highly recommended!', author: 'Jane Doe', role: 'CEO, Company Inc.' },
+  template: '<div style="padding:32px 24px;background:#f8f9fa;text-align:center;margin:8px 12px;border-radius:8px;"><div style="font-size:36px;color:#ddd;margin-bottom:8px;">❝</div><blockquote style="font-size:16px;font-style:italic;color:#555;max-width:500px;margin:0 auto 16px;line-height:1.6;">{{quote}}</blockquote><strong style="font-size:14px;color:#333;">{{author}}</strong><div style="font-size:13px;color:#888;">{{role}}</div></div>',
+  propsConfig: [
+    { key: 'quote', label: 'Quote', type: 'textarea' },
+    { key: 'author', label: 'Author', type: 'text' },
+    { key: 'role', label: 'Role', type: 'text' }
+  ]
+});
+
+registerComponent('contact', {
+  category: 'content', label: 'Contact Form', icon: '✉',
+  defaultProps: { email: 'hello@example.com', btnText: 'Send Message', accentColor: '#e94560' },
+  template: '<section style="padding:40px 24px;background:#fff;"><form style="max-width:500px;margin:0 auto;"><div style="margin-bottom:12px;"><label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px;">Name</label><input type="text" placeholder="Your name" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;"></div><div style="margin-bottom:12px;"><label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px;">Email</label><input type="email" placeholder="{{email}}" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;"></div><div style="margin-bottom:12px;"><label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px;">Message</label><textarea rows="4" placeholder="Your message" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;resize:vertical;"></textarea></div><button type="submit" style="background:{{accentColor}};color:#fff;border:none;padding:12px 24px;border-radius:4px;font-size:15px;font-weight:600;cursor:pointer;">{{btnText}}</button></form></section>',
+  propsConfig: [
+    { key: 'email', label: 'Placeholder Email', type: 'text' },
+    { key: 'btnText', label: 'Button Text', type: 'text' },
+    { key: 'accentColor', label: 'Accent Color', type: 'color' }
+  ]
+});
+
+registerComponent('form', {
+  category: 'content', label: 'Form', icon: '📋',
+  defaultProps: { heading: 'Get in Touch', nameLabel: 'Name', emailLabel: 'Email', messageLabel: 'Message', btnText: 'Submit', accentColor: '#e94560' },
+  template: '<section style="padding:40px 24px;background:#fff;"><form style="max-width:480px;margin:0 auto;background:#fafafa;padding:28px;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,0.04);"><h3 style="margin:0 0 20px;font-size:22px;color:#222;text-align:center;">{{heading}}</h3><div style="margin-bottom:14px;"><label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px;">{{nameLabel}}</label><input type="text" placeholder="{{nameLabel}}" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:#fff;"></div><div style="margin-bottom:14px;"><label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px;">{{emailLabel}}</label><input type="email" placeholder="{{emailLabel}}" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:#fff;"></div><div style="margin-bottom:14px;"><label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:4px;">{{messageLabel}}</label><textarea rows="4" placeholder="{{messageLabel}}" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;resize:vertical;background:#fff;"></textarea></div><button type="submit" style="width:100%;background:{{accentColor}};color:#fff;border:none;padding:12px;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;">{{btnText}}</button></form></section>',
+  propsConfig: [
+    { key: 'heading', label: 'Heading', type: 'text' },
+    { key: 'nameLabel', label: 'Name Label', type: 'text' },
+    { key: 'emailLabel', label: 'Email Label', type: 'text' },
+    { key: 'messageLabel', label: 'Message Label', type: 'text' },
+    { key: 'btnText', label: 'Button Text', type: 'text' },
+    { key: 'accentColor', label: 'Accent Color', type: 'color' }
+  ]
+});
+
+registerComponent('signature', {
+  category: 'content', label: 'Signature', icon: '✍',
+  defaultProps: { name: 'Sarah Johnson', title: 'CEO & Founder', text: 'Building the future, one step at a time.', photo: '👩‍💻' },
+  template: '<div style="padding:24px;display:flex;align-items:center;gap:16px;background:#fafafa;margin:8px 12px;border-radius:8px;"><div style="font-size:48px;width:64px;height:64px;display:flex;align-items:center;justify-content:center;background:#e94560;color:#fff;border-radius:50%;flex-shrink:0;">{{photo}}</div><div><strong style="font-size:16px;color:#222;display:block;">{{name}}</strong><span style="font-size:13px;color:#e94560;font-weight:600;">{{title}}</span><p style="margin:6px 0 0;font-size:13px;color:#666;line-height:1.4;">{{text}}</p></div></div>',
+  propsConfig: [
+    { key: 'name', label: 'Name', type: 'text' },
+    { key: 'title', label: 'Title', type: 'text' },
+    { key: 'text', label: 'Description', type: 'text' },
+    { key: 'photo', label: 'Photo Emoji', type: 'text' }
+  ]
+});
+
+registerComponent('product', {
+  category: 'content', label: 'Product', icon: '🏷',
+  defaultProps: { name: 'Premium Widget', price: '$49.99', oldPrice: '$79.99', desc: 'High-quality widget with premium features and lifetime warranty.', badge: 'Sale', btnText: 'Add to Cart', accentColor: '#e94560' },
+  template: '<div style="padding:16px;margin:8px 12px;"><div style="border:1px solid #eee;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);max-width:320px;margin:0 auto;background:#fff;"><div style="height:160px;background:linear-gradient(135deg,{{accentColor}}22,#f8f9fa);display:flex;align-items:center;justify-content:center;position:relative;"><span style="font-size:48px;">📦</span><span style="position:absolute;top:12px;left:12px;background:{{accentColor}};color:#fff;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;">{{badge}}</span><span style="position:absolute;top:12px;right:12px;background:#fff;color:#333;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:700;">★ 4.8</span></div><div style="padding:16px;"><h3 style="margin:0 0 6px;font-size:17px;color:#222;">{{name}}</h3><div style="margin-bottom:8px;"><span style="font-size:22px;font-weight:800;color:{{accentColor}};">{{price}}</span><span style="font-size:14px;color:#999;text-decoration:line-through;margin-left:8px;">{{oldPrice}}</span></div><p style="font-size:13px;color:#666;line-height:1.5;margin:0 0 14px;">{{desc}}</p><button style="width:100%;background:{{accentColor}};color:#fff;border:none;padding:10px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;">{{btnText}}</button></div></div></div>',
+  propsConfig: [
+    { key: 'name', label: 'Product Name', type: 'text' },
+    { key: 'price', label: 'Price', type: 'text' },
+    { key: 'oldPrice', label: 'Old Price', type: 'text' },
+    { key: 'desc', label: 'Description', type: 'textarea' },
+    { key: 'badge', label: 'Badge Text', type: 'text' },
+    { key: 'btnText', label: 'Button Text', type: 'text' },
+    { key: 'accentColor', label: 'Accent Color', type: 'color' }
+  ]
+});
+
+registerComponent('heading', {
+  category: 'typography', label: 'Heading', icon: 'H',
+  defaultProps: { text: 'Heading Text', level: 'h2', align: 'left', color: '#222' },
+  template: function(p) {
+    var sizes = { h1: '36px', h2: '28px', h3: '22px', h4: '18px', h5: '16px', h6: '14px' };
+    return '<' + p.level + ' class="comp-heading" style="margin:12px 16px;font-size:' + (sizes[p.level] || '28px') + ';text-align:' + p.align + ';color:' + p.color + ';font-weight:700;line-height:1.3;">' + p.text + '</' + p.level + '>';
+  },
+  propsConfig: [
+    { key: 'text', label: 'Text', type: 'text' },
+    { key: 'level', label: 'Level', type: 'select', options: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] },
+    { key: 'align', label: 'Alignment', type: 'select', options: ['left', 'center', 'right'] },
+    { key: 'color', label: 'Color', type: 'color' }
+  ]
+});
+
+registerComponent('paragraph', {
+  category: 'typography', label: 'Paragraph', icon: 'P',
+  defaultProps: { text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', align: 'left', color: '#444', size: '15px' },
+  template: '<p class="comp-paragraph" style="margin:8px 16px;font-size:{{size}};text-align:{{align}};color:{{color}};line-height:1.6;">{{text}}</p>',
+  propsConfig: [
+    { key: 'text', label: 'Text', type: 'textarea' },
+    { key: 'align', label: 'Alignment', type: 'select', options: ['left', 'center', 'right', 'justify'] },
+    { key: 'color', label: 'Color', type: 'color' },
+    { key: 'size', label: 'Size', type: 'select', options: ['13px', '14px', '15px', '16px', '18px'] }
+  ]
+});
+
+registerComponent('blockquote', {
+  category: 'typography', label: 'Blockquote', icon: '❝',
+  defaultProps: { text: 'The only way to do great work is to love what you do.', cite: 'Steve Jobs', borderColor: '#e94560' },
+  template: '<blockquote class="comp-blockquote" style="margin:16px 24px;padding:12px 16px;border-left:4px solid {{borderColor}};background:#f9f9f9;border-radius:0 4px 4px 0;"><p style="font-style:italic;font-size:15px;color:#555;line-height:1.6;margin:0 0 8px;">&ldquo;{{text}}&rdquo;</p><cite style="font-size:13px;color:#888;font-style:normal;">— {{cite}}</cite></blockquote>',
+  propsConfig: [
+    { key: 'text', label: 'Quote', type: 'textarea' },
+    { key: 'cite', label: 'Citation', type: 'text' },
+    { key: 'borderColor', label: 'Border Color', type: 'color' }
+  ]
+});
+
+registerComponent('code', {
+  category: 'typography', label: 'Code Block', icon: '<>',
+  defaultProps: { code: 'const greeting = "Hello World";\nconsole.log(greeting);', language: 'javascript' },
+  template: function(p) {
+    var escaped = p.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return '<pre class="comp-code" style="margin:12px 16px;padding:16px;background:#1e1e2e;color:#cdd6f4;border-radius:6px;font-family:\'SF Mono\',\'Fira Code\',monospace;font-size:13px;line-height:1.5;overflow-x:auto;"><code>' + escaped + '</code></pre>';
+  },
+  propsConfig: [
+    { key: 'code', label: 'Code', type: 'textarea' },
+    { key: 'language', label: 'Language', type: 'text' }
+  ]
+});
+
+registerComponent('navbar', {
+  category: 'navigation', label: 'Navbar', icon: '≡',
+  defaultProps: { brand: 'BrandName', link1: 'Home', link2: 'About', link3: 'Services', link4: 'Contact', bgColor: '#ffffff', textColor: '#333' },
+  template: '<nav class="comp-navbar" style="background:{{bgColor}};color:{{textColor}};padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;border-bottom:1px solid #eee;font-family:sans-serif;"><strong style="font-size:20px;font-weight:700;">{{brand}}</strong><div style="display:flex;gap:24px;"><a style="color:{{textColor}};text-decoration:none;font-size:14px;font-weight:500;">{{link1}}</a><a style="color:{{textColor}};text-decoration:none;font-size:14px;font-weight:500;">{{link2}}</a><a style="color:{{textColor}};text-decoration:none;font-size:14px;font-weight:500;">{{link3}}</a><a style="color:{{textColor}};text-decoration:none;font-size:14px;font-weight:500;">{{link4}}</a></div></nav>',
+  propsConfig: [
+    { key: 'brand', label: 'Brand', type: 'text' },
+    { key: 'link1', label: 'Link 1', type: 'text' },
+    { key: 'link2', label: 'Link 2', type: 'text' },
+    { key: 'link3', label: 'Link 3', type: 'text' },
+    { key: 'link4', label: 'Link 4', type: 'text' },
+    { key: 'bgColor', label: 'Background', type: 'color' },
+    { key: 'textColor', label: 'Text Color', type: 'color' }
+  ]
+});
+
+
 function renderPalette(filter) {
   const q = (filter || '').toLowerCase().trim();
   let html = '';
